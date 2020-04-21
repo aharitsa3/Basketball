@@ -1,19 +1,25 @@
+library(readr)
 library(dplyr)
 library(ggplot2)
+library(fuzzyjoin)
 
-team_stats_2019 <- read_csv("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/team_stats_2019.csv", skip = 1) %>%
-  mutate(Team = gsub('\\*','',Team))
+# team_stats_2019 <- read_csv("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/team_stats_2019.csv", skip = 1) %>%
+#   mutate(Team = gsub('\\*','',Team))
+team_stats_2019 <- read_csv("~/Desktop/Basketball/Data/team_stats_2019.csv",skip=1) 
+
+team_stats_2019 <- team_stats_2019 %>%
+  mutate(Team = gsub('//*.$','',Team))
 
 total_df = data.frame()
 
-for(team in c('TOR','ATL','LAL','OKC','MIA','HOU','GSW','PHO','CLE','POR','UTA')){
-  # filename = paste0("Desktop/basketballProject/",team,"_team_totals_2019.csv")
-  filename = paste0("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/",team,"_team_totals_2019.csv")
+for(team in c('TOR','ATL','LAL','OKC','MIA','HOU','GSW','PHO','CLE','POR')){
+  filename = paste0("~/Desktop/Basketball/Data/",team,"_team_totals_2019.csv")
+  # filename = paste0("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/",team,"_team_totals_2019.csv")
   team_totals = read_csv(filename) %>%
     rename(Player = X2) 
   
-  # filename = paste0("Desktop/basketballProject/",team,"_roster_2019.csv")
-  filename = paste0("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/",team,"_roster_2019.csv")
+  filename = paste0("~/Desktop/Basketball/Data/",team,"_roster_2019.csv")
+  # filename = paste0("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/",team,"_roster_2019.csv")
   roster = read_csv(filename)
 
   a <- team_totals %>% 
@@ -36,8 +42,9 @@ for(team in c('TOR','ATL','LAL','OKC','MIA','HOU','GSW','PHO','CLE','POR','UTA')
 
 test <- total_df %>%
   group_by(Team) %>%
-  summarise(PER = sum(PER))
+  summarise(PER = sum(PER),
+            efg = mean(`eFG%`))
 
 
-ggplot(data=test,aes(x=Team,y=PER)) +
-  geom_bar()
+ggplot(data=test,aes(Team,PER)) +
+  geom_col()
