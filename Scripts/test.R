@@ -43,7 +43,7 @@ for(team in c('TOR','ATL','LAL','OKC','MIA','HOU','GSW','PHO','CLE','POR','DEN',
   
   filename = paste0("~/Desktop/Basketball/Data/",team,"_roster_2019.csv")
   # filename = paste0("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/",team,"_roster_2019.csv")
-  roster = read_csv(filename)
+  roster <- read_csv(filename)
 
   a <- team_totals %>% 
     merge(roster,by='Player') %>%
@@ -75,26 +75,34 @@ final <- total_df %>%
 test <- final %>%
   group_by(Team) %>%
   summarise(PER = sum(PER),
+            Pos = mean(Pos),
             efg = mean(`eFG%`),
             fgp = mean(`FG%`),
             Playoff=mean(Playoff),
             `3PA` = mean(`3PA`),
-            `3P%` = mean(`3P%`),
+            P3 = mean(`3P%`),
             FTA = mean(FTA),
-            `FT%` = mean(`FT%`),
+            `FT` = mean(`FT%`),
             AST = sum(AST),
             TOV = sum(TOV),
             STL = sum(STL),
             experience = mean(Exp),
             Age = mean(Age),
-            W = mean(W),
-            L = mean(L))
+            W = trunc(mean(W)/10)*10,
+            L = mean(L),
+            orb = sum(ORB))
 
 
 ggplot(data=test,aes(Team,W,fill=Playoff)) +
   geom_col() #+facet_wrap(vars(Team))
 
 
-
-model <- glm(sqrt(log(W)) ~ PER + efg + fgp + FTA + experience - 1,data=test,family='poisson')
+model <- lm(W ~ FT + experience + P3 - 1,data=test)
 summary(model)
+plot(model$residuals)
+
+pred_data <- data.frame(PER=159,efg=.542,fgp=.483,FTA=152,FT=.786,P3=.319,AST=1783,
+                        Age=26.08,Pos=3.16,experience=5.08,W=50,orb=933)
+predict(model,pred_data)
+
+
