@@ -33,7 +33,9 @@ team_stats_2019 <- team_stats_2019 %>%
 
 total_df = data.frame()
 
-for(team in c('TOR','ATL','LAL','OKC','MIA','HOU','GSW','PHO','CLE','POR')){
+for(team in c('TOR','ATL','LAL','OKC','MIA','HOU','GSW','PHO','CLE','POR','DEN','UTA','SAS',
+              'LAC','SAC','MIN','MEM','NOP','DAL','MIL','PHI','BOS','IND','BRK','ORL','DET',
+              'CHA','WAS','CHI','NYK')){
   filename = paste0("~/Desktop/Basketball/Data/",team,"_team_totals_2019.csv")
   # filename = paste0("C:/Users/Ashwin's Computer/Desktop/Basketball/Data/",team,"_team_totals_2019.csv")
   team_totals = read_csv(filename) %>%
@@ -89,10 +91,10 @@ test <- final %>%
             L = mean(L))
 
 
-ggplot(data=test,aes(Team,L,fill=Playoff)) +
+ggplot(data=test,aes(Team,W,fill=Playoff)) +
   geom_col() #+facet_wrap(vars(Team))
 
 
 
-model <- lm(sqrt(log(W)) ~ PER + efg + fgp + FTA + experience - 1,data=test)
+model <- glm(sqrt(log(W)) ~ PER + efg + fgp + FTA + experience - 1,data=test,family='poisson')
 summary(model)
